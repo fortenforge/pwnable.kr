@@ -1,5 +1,4 @@
 from pwn import *
-import struct
 
 # col
 host = 'pwnable.kr'
