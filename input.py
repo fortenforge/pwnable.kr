@@ -1,6 +1,6 @@
 from pwn import *
 
-# asm
+# input
 host = 'pwnable.kr'
 user = 'input2'
 password = 'guest'
