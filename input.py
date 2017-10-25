@@ -9,6 +9,12 @@ port = 2222
 directory = '/tmp/fortenforge'
 rport = "36789"
 
+# Notes
+#   * The trickiest part is stage 4. You need to create a new directory in
+#     `/tmp` and then symlink both `flag` and `input`
+#   * Then, in this new directory, you're free to create a new file that
+#     `input` will read from
+
 def attack():
   s = ssh(host=host, user=user, password=password, port=port)
 
